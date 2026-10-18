@@ -1,6 +1,6 @@
 # 🛠️ HelpDesk AI — IT Support Knowledge Assistant
 
-**🔗 Live demo: `https://appdesk-ai1-jzkkbtrqxupzykjimorwtu.streamlit.app/`** (click → ask a question, no login, no API key)
+**🔗 Live demo: [Help Desk AI](https://appdesk-ai1-jzkkbtrqxupzykjimorwtu.streamlit.app/)** (click → ask a question, no login, no API key)
 
 A Retrieval-Augmented Generation (RAG) app that answers IT support questions from runbooks and SOPs **with source citations**. Upload your own PDFs/Markdown/TXT and query them instantly.
 
