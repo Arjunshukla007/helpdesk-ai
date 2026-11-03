@@ -1,45 +1,54 @@
-# 🛠️ HelpDesk AI — IT Support Knowledge Assistant
+# HelpDesk AI — IT Support Knowledge Assistant
 
-**🔗 Live demo: [Help Desk AI](https://appdesk-ai1-jzkkbtrqxupzykjimorwtu.streamlit.app/)** (click → ask a question, no login, no API key)
+A local-first knowledge assistant for IT runbooks and support documents. It supports PDF, Markdown and TXT uploads, hybrid retrieval, source-backed troubleshooting guidance, feedback and L2 escalation.
 
-A Retrieval-Augmented Generation (RAG) app that answers IT support questions from runbooks and SOPs **with source citations**. Upload your own PDFs/Markdown/TXT and query them instantly.
+## RAG architecture
 
-## Why this is useful in the IT industry
-L1/L2 support teams lose hours searching wikis and old tickets. HelpDesk AI gives instant, grounded answers from the team's own documents, and says *"I don't know"* instead of guessing.
+`PDF/Markdown/TXT → overlapping chunks → local sentence-transformer embeddings → dense retrieval + BM25 → reciprocal-rank fusion → optional cross-encoder reranking → answer with source references`
 
-## Features
-- Semantic search with local embeddings (`all-MiniLM-L6-v2`) + **FAISS** vector index
-- Extractive answers: **no hallucination**, every answer is traceable to a source chunk
-- Confidence score + latency shown for each query
-- Upload your own PDF / MD / TXT docs and index them live
-- **Zero API keys, zero cost**: runs on CPU
-- Dockerised, unit tested, CI via GitHub Actions
+- **Local embeddings:** `sentence-transformers/all-MiniLM-L6-v2` (downloads the model on first use, then runs locally).
+- **Dense retrieval:** FAISS inner-product index when available; normalized NumPy cosine-search fallback otherwise.
+- **Lexical retrieval:** BM25 for exact technical terms, commands and product names.
+- **Fusion:** Reciprocal Rank Fusion combines dense and lexical rankings.
+- **Optional reranking:** local CrossEncoder, disabled by default.
+- **Answering:** extractive, source-backed answers by default; optional OpenAI generation grounded in retrieved chunks.
+- **Privacy:** uploaded files remain in the current Streamlit session's knowledge-base copy. When OpenAI generation is enabled, retrieved context is sent to OpenAI to draft the answer; embeddings and retrieval remain local.
 
-## Architecture
-`Docs → chunking → MiniLM embeddings → FAISS index → top-k retrieval → sentence ranking → answer + sources`
+## Run locally
 
-## Run locally (2 commands)
 ```bash
+python -m venv .venv
+# Windows: .venv\\Scripts\\activate
+# macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
 streamlit run app.py
 ```
-Or with Docker:
-```bash
-docker build -t helpdesk-ai . && docker run -p 8501:8501 helpdesk-ai
-```
 
-## Tech stack
-Python • Streamlit • sentence-transformers • FAISS • pypdf • Docker • pytest • GitHub Actions
+The embedding model downloads on first run. Retrieval runs locally after the model is available.
 
-## Author
-Arjun Shukla — arjunshukla085@gmail.com
+## Optional OpenAI generation
 
-## Add your own help desk entries
-Add sections to any `.md` file in `data/kb/` (or create a new one). Use this pattern, and put the words people actually type in the title:
-```
-## Your issue title (extra search words, synonyms)
-First fix, written as a clear sentence.
+Copy `.env.example` to `.env` and set `ENABLE_OPENAI_GENERATION=true` and `OPENAI_API_KEY`. The Streamlit sidebar also includes a toggle. Without an API key, keep generation disabled and use extractive answers. If OpenAI generation fails, the application falls back to a local extractive answer.
 
-Next step or fallback, such as a command in `backticks`.
-```
-Every sentence becomes a numbered solution step and every `backtick` command becomes a copyable command block.
+Never commit `.env` or an API key; `.gitignore` excludes local environment files.
+
+## Optional reranking
+
+Set `RAG_USE_RERANKER=true` to load `cross-encoder/ms-marco-MiniLM-L-6-v2` locally. This downloads an additional model on first use. Keep it disabled for a lighter default setup.
+
+## Tests and evaluation
+
+Run `pytest -q`. Tests use a deterministic injected embedder and mocked generation, so they do not download models or call OpenAI. `recall_at_k` and `reciprocal_rank` helpers support evaluation against a labeled query set. No performance or quality benchmark is claimed until measured on a documented dataset.
+
+## Preserved features
+
+- Built-in Markdown knowledge base and private per-session document uploads.
+- PDF, Markdown and TXT ingestion.
+- Troubleshooting steps, extracted commands and related issues.
+- Retrieved source chunk inspection.
+- Positive/negative feedback and L2 escalation ticket generation.
+- Streamlit interface and Docker entry point.
+
+## Security
+
+Keep API credentials in environment variables or Streamlit secrets. Retrieved document text is treated as untrusted context in the generation prompt. Review any suggested commands before execution.
