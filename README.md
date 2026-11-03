@@ -2,6 +2,12 @@
 
 A local-first knowledge assistant for IT runbooks and support documents. It supports PDF, Markdown and TXT uploads, hybrid retrieval, source-backed troubleshooting guidance, feedback and L2 escalation.
 
+## Live application
+
+**[🚀 Try HelpDesk AI — Streamlit Live Demo](https://appdesk-ai-vl32hcynngexuyv9xohrnz.streamlit.app/)**
+
+Recruiters and reviewers can open the live application directly to explore the interface and try the support assistant. Availability and features depend on the currently deployed Streamlit version.
+
 ## RAG architecture
 
 `PDF/Markdown/TXT → overlapping chunks → local sentence-transformer embeddings → dense retrieval + BM25 → reciprocal-rank fusion → optional cross-encoder reranking → answer with source references`
