@@ -1,4 +1,8 @@
-streamlit
-scikit-learn
-numpy
-pypdf
+streamlit>=1.35,<2
+pypdf>=4,<7
+numpy>=1.26,<3
+sentence-transformers>=3.0,<6
+faiss-cpu>=1.8,<2
+openai>=1.40,<3
+python-dotenv>=1,<2
+pytest>=8,<9
