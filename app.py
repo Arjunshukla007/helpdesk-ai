@@ -41,9 +41,10 @@ if "kb" not in st.session_state:
 kb = st.session_state.kb
 st.session_state.setdefault("tickets", [])
 st.session_state.setdefault("current_ticket", None)
+st.session_state.setdefault("use_openai", os.getenv("ENABLE_OPENAI_GENERATION", "false").lower() == "true")
 
 st.title("🛠️ HelpDesk AI — IT Support Knowledge Assistant")
-st.caption("Ask IT questions and get answers with sources. Retrieval-based, no API key, no paid service.")
+st.caption("Ask IT questions and get source-backed answers. Local embeddings and retrieval, with optional OpenAI answer generation.")
 
 with st.sidebar:
     st.header("📄 Add your own docs")
@@ -59,6 +60,10 @@ with st.sidebar:
         st.session_state.uploaded = []
         st.rerun()
     st.divider()
+    st.subheader("Answer generation")
+    st.checkbox("Use OpenAI for generated answers", key="use_openai", help="Embeddings and retrieval remain local. OpenAI is called only to generate an answer.")
+    if st.session_state.use_openai and not os.getenv("OPENAI_API_KEY"):
+        st.warning("Set OPENAI_API_KEY in your environment or .env file. Extractive answers remain available.")
     st.metric("Chunks in knowledge base", len(kb.chunks))
     if not base_kb.chunks:
         st.error("Built-in knowledge base is empty. Make sure the data/kb folder is in your repo.")
@@ -102,6 +107,14 @@ def render_result(last: dict):
             st.markdown(f"**{pretty_title(res['title'])}**")
             st.caption(f"Confidence: {confidence_label(res['confidence'])} ({res['confidence']:.2f}) "
                        f"• Source: {res['source']} • {res['ms']:.0f} ms")
+            st.markdown("#### 🤖 Answer")
+            st.markdown(res.get("answer") or "The retrieved documents did not contain enough information to draft an answer.")
+            if res.get("answer_mode") == "openai":
+                st.caption("Generated with OpenAI using retrieved document context.")
+            else:
+                st.caption("Extractive answer from locally retrieved documents.")
+            if res.get("generation_error"):
+                st.warning("OpenAI generation was unavailable; showing a local extractive answer instead.")
             st.markdown("#### ✅ Recommended solution")
             for i, step in enumerate(res["steps"], 1):
                 st.markdown(f"{i}. {step}")
@@ -148,7 +161,7 @@ def render_result(last: dict):
 query = st.chat_input("Describe your IT problem...") or picked
 if query:
     t0 = time.time()
-    res = kb.solve(query)
+    res = kb.solve(query, use_llm=st.session_state.use_openai)
     res["ms"] = (time.time() - t0) * 1000
     st.session_state.last = {"query": query, "res": res}
     st.session_state.feedback = None
