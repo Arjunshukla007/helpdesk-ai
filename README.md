@@ -1,6 +1,19 @@
 # HelpDesk AI — IT Support Knowledge Assistant
 
+> **Try the project:** [🚀 Open the live HelpDesk AI demo](https://appdesk-ai-vl32hcynngexuyv9xohrnz.streamlit.app/)  
+> **Source code:** [Browse this GitHub repository](https://github.com/Arjunshukla007/helpdesk-ai) · **[Setup and run locally](#run-locally)**
+
 A local-first knowledge assistant for IT runbooks and support documents. It supports PDF, Markdown and TXT uploads, hybrid retrieval, source-backed troubleshooting guidance, feedback and L2 escalation.
+
+## Recruiter quick start
+
+1. Open the [live demo](https://appdesk-ai-vl32hcynngexuyv9xohrnz.streamlit.app/).
+2. Try a sample question such as **“Docker container keeps restarting, what should I check?”**
+3. Upload a PDF, Markdown or TXT runbook from the sidebar and select **Index uploaded files**.
+4. Review the generated guidance and expand **Sources** to inspect the retrieved document chunks.
+5. Use **Yes, fixed** or **Not fixed** to try the feedback and L2 ticket workflow.
+
+No installation or API key is needed to try the hosted demo. The live site is the quickest way to review the user experience; the local setup below lets you run the source code yourself.
 
 ## RAG architecture
 
@@ -16,15 +29,24 @@ A local-first knowledge assistant for IT runbooks and support documents. It supp
 
 ## Run locally
 
+**Requirements:** Python 3.10 or newer and Git.
+
 ```bash
+git clone https://github.com/Arjunshukla007/helpdesk-ai.git
+cd helpdesk-ai
+
 python -m venv .venv
-# Windows: .venv\\Scripts\\activate
-# macOS/Linux: source .venv/bin/activate
+# Windows PowerShell:
+.venv\Scripts\Activate.ps1
+# macOS/Linux:
+# source .venv/bin/activate
+
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 streamlit run app.py
 ```
 
-The embedding model downloads on first run. Retrieval runs locally after the model is available.
+Open the local URL printed by Streamlit (usually `http://localhost:8501`). The embedding model downloads on first run. Retrieval runs locally after the model is available.
 
 ## Optional OpenAI generation
 
@@ -52,3 +74,7 @@ Run `pytest -q`. Tests use a deterministic injected embedder and mocked generati
 ## Security
 
 Keep API credentials in environment variables or Streamlit secrets. Retrieved document text is treated as untrusted context in the generation prompt. Review any suggested commands before execution.
+
+## Development status
+
+The advanced local-RAG upgrade is also available in the [open draft pull request](https://github.com/Arjunshukla007/helpdesk-ai/pull/1). Check the pull request for the proposed branch changes and review status before assuming those changes are part of the default branch.
