@@ -1,9 +1,19 @@
 # HelpDesk AI — IT Support Knowledge Assistant
 
+> **Portfolio project by Arjun Shukla | Junior AI Application Developer**
+>
 > **Try the project:** [🚀 Open the live HelpDesk AI demo](https://appdesk-ai-vl32hcynngexuyv9xohrnz.streamlit.app/)  
 > **Source code:** [Browse this GitHub repository](https://github.com/Arjunshukla007/helpdesk-ai) · **[Setup and run locally](#run-locally)**
 
-A local-first knowledge assistant for IT runbooks and support documents. It supports PDF, Markdown and TXT uploads, hybrid retrieval, source-backed troubleshooting guidance, feedback and L2 escalation.
+A Python-based IT support knowledge assistant that searches runbooks and support documents and returns source-backed troubleshooting guidance. It supports PDF, Markdown and TXT uploads, hybrid retrieval, feedback and L2 escalation.
+
+## Project highlights
+
+- Document ingestion and text chunking for PDF, Markdown and TXT files.
+- Hybrid retrieval using dense vector search and BM25, combined with Reciprocal Rank Fusion.
+- Source references so users can inspect the supporting document chunks.
+- Optional OpenAI-powered answer generation; local extractive answers remain available without an API key.
+- Automated tests and a GitHub Actions workflow.
 
 ## Recruiter quick start
 
@@ -37,7 +47,7 @@ cd helpdesk-ai
 
 python -m venv .venv
 # Windows PowerShell:
-.venv\Scripts\Activate.ps1
+.venv\\Scripts\\Activate.ps1
 # macOS/Linux:
 # source .venv/bin/activate
 
